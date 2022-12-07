@@ -9,6 +9,7 @@ Created on Sun Oct  2 17:23:57 2022
 import Program as logic
 import random
 import re
+import time
 #import dataman_logic as logic
 #import dataman_data as data
 
@@ -23,8 +24,8 @@ class Dataman_UI:
         
         print("Dataman Main Menu")
         print("1.Answer Checker")
-        print("2.Memory Bank Pending")
-        print("3.Number Guesser Pending")
+        print("2.Memory Bank ")
+        print("3.Number Guesser ")
         print("5.Exit")
     
     def menu(self):
@@ -43,6 +44,8 @@ class Dataman_UI:
                 self.answerChecker()
             elif choice == 2 :
                 self.MemoryBankMenu()
+            elif choice == 3 :
+                self.GuessNumber()
             else:
                 print("Please make another selection.")
                 return True 
@@ -141,53 +144,75 @@ class Dataman_UI:
         #perform calculations to determine answer and store in variable
         #Get input from the user to verify input to the answer
         #Display to user if the answer is correct or not
-        auth_operators={
+        # i dig this but let's wait on it
+        """auth_operators={
             "+": self.logic.operator.add,
             "-": self.logic.operator.sub,
             "*": self.logic.operator.mul,
             "/": self.logic.operator.truediv}
-        count =0
+        """
+        count = 0
         score = 0
 
-        #Count number of lines in GameBank file to ensure math problems exist
-        with open("GameBank.txt", mode="r") as gameFile:              
-            for count, line in enumerate(gameFile):    
-                
-                pass    
+        # try to open file, catch if can't
+        # if it's empty the for loop just doesn't repeat
+        problems = []
+        try:
+            with open("GameBank.txt", mode="r") as gameFile:              
+
+                for problem in gameFile:     
+                    problems.append(problem)
+                    print(problem)
+            gameFile.close()
+            print("file done!")
+        except Exception as err:
+            print('file error:', err)
         
-        if count + 1 > 0:  
-            with open("GameBank.txt", mode="r") as gameFile:
-                #gameDoc = gameFile.readline()
-             
-                count +=1
-                while count != 0:                    
-                        problem = gameFile.readline()#Read each line in text document                   
-                        problem = ''.join(problem.split())#Join string at locations that are white space
-                        letter = list(filter(None, re.split(r'(\d+)',problem)))#Split  list at the digit and operator and filter out delimeters(",") from list
-
-                        print(letter)#THIS IS FOR DEBUGGING PURPOSES ONLY. WILL BE REMOVED WHEN ALL BUGS ARE FIXED.
-                        #Declare and initialize variables with appropriate subscipt
-                        num1 = int(letter[0])
-                        num2 = int(letter[2])
-                        operator = (letter[1])
-
-                        #totalFromDoc = int(letter[4])
-                        total = auth_operators[operator](num1,num2)#Calculate total
-                        print(total)#THIS IS FOR DEBUGGING PURPOSES ONLY. WILL BE REMOVED WHEN ALL BUGS ARE FIXED.
-                        answer = input(f"{num1} {operator} {num2} = ?  ")#Get input from user
-
-                        if answer == str(total):#Verify answer is correct or incorrect
-                            print("Great Job!")
-                            score += 1
-                        else:
-                            print("Sorry! Incorrect Answer.")
-                            count -= 1  
-
-                        print(f"\n*****GAMEOVER*****\n\nPLAYER SCORE: {score}\n\n******************\n")#Display players score when game is finished
-                        gameFile.close()
-        else:
-            print("Memory Bank Empty...")#Display if file is empty
-            gameFile.close()#Close file
+        # now, we'll just work with problems, the list of lines
+        totalTime = 0                
+        for problem in problems:
+            problem = ''.join(problem.split())#Join string at locations that are white space
+            
+            clockStart = time.time()
+                            
+            letter = list(filter(None, re.split(r'(\d+)',problem)))#Split  list at the digit and operator and filter out delimeters(",") from list
+            if len (letter) < 3 :
+                continue # skips to next problem b/c this one was incomplete
+                
+            print(letter)#THIS IS FOR DEBUGGING PURPOSES ONLY. WILL BE REMOVED WHEN ALL BUGS ARE FIXED.
+            #Declare and initialize variables with appropriate subscipt
+            num1 = int(letter[0])
+            num2 = int(letter[2])
+            operator = (letter[1])
+    
+            #totalFromDoc = int(letter[4])
+            #total = auth_operators[operator](num1,num2)#Calculate total\
+            total = 0 # since we haven't implemented all operators yet
+            if operator == "+":
+                total = num1 + num2
+            elif operator == "-":
+                total = num1 - num2
+            elif operator == "*":
+                total = num1 * num2
+            elif operator == "/":
+                total = num1 // num2 # // for interger division, if / it would be left wiith a remandir
+            else:
+                raise NotImplementedError("operator", operator, "not impl.")
+            print(total)#THIS IS FOR DEBUGGING PURPOSES ONLY. WILL BE REMOVED WHEN ALL BUGS ARE FIXED.
+            answer = input(f"{num1} {operator} {num2} = ?  ")#Get input from user
+    
+            if answer == str(total):#Verify answer is correct or incorrect
+                print("Great Job!")
+                score += 1
+            else:
+                print("Sorry! Incorrect Answer.")
+                count -= 1  
+            clockEnd = time.time()
+            elapsed = clockEnd - clockStart
+            print(f'{elapsed:.2f}', "seconds")
+            totalTime += elapsed
+        print(f"\n*****GAMEOVER*****\n\nPLAYER SCORE: {score}\n\nTime: {totalTime}\n******************\n")#Display players score when game is finished
+        
 
         #ADD TO GAMEBANK FILE FUNCTION----------------------------------------------------------------------------------------------
     def AddToBank(self):
@@ -197,6 +222,8 @@ class Dataman_UI:
         #Write to txt doc
 
         #Get user to input admin password and verify that the inputted password matches the stored admin password in doc.
+        print("sorry, not implemented")
+        return
         password = input("Enter Admin Password --> ")
         with open("DatamanPassword.txt",mode = "r") as readDoc:
             #adminPass = readDoc.readline()
@@ -287,7 +314,7 @@ class Dataman_UI:
     
     
     
-    def GuessNumberMenu():
+    def GuessNumberMenu(self):
         #Display guess number menu to user
         print("Number Guesser\n"+
               "1. 1-10\n"+
